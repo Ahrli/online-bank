@@ -1,0 +1,49 @@
+services:
+  mysql:
+    image: mysql:5.7.22
+    container_name: bankmysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: onlinebanking
+      MYSQL_USER: onlinebank
+      MYSQL_PASSWORD: onlinebank
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../sql_dump:/docker-entrypoint-initdb.d
+    networks:
+      app_network:
+        aliases:
+          - bankmysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  online-bank:
+    image: eclipse-temurin:8-jre
+    container_name: online-bank
+    ports:
+      - "8889:8888"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ../target/online-bank-0.0.1-SNAPSHOT.jar:/app/online-bank.jar:ro
+    networks:
+      - app_network
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://bankmysql:3306/onlinebanking?useSSL=false
+    command:
+      - java
+      - -jar
+      - /app/online-bank.jar
+    expose:
+      - "8888"
+
+networks:
+  app_network:
+    name: app_network
+    driver: bridge

@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:5.7.22
+    container_name: bankmysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    # ports:
+    #   - "3306:3306"
+    volumes:
+      - ./sql_dump:/docker-entrypoint-initdb.d
+    networks:
+      - app_network
+
+  online-bank:
+    image: ravikalla/online-bank:latest
+    container_name: online-bank
+    volumes:
+      - ./target/online-bank-0.0.1-SNAPSHOT.jar:/code/online-bank-0.0.1-SNAPSHOT.jar
+    ports:
+      - "8888:8888"
+    command:
+      sh -c "java  -jar /code/online-bank-0.0.1-SNAPSHOT.jar"
+     
+
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+    links:
+      - mysql:localhost
+
+networks:
+  app_network:
+    driver: bridge
