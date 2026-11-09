@@ -76,11 +76,27 @@ public class AccountController {
     }
 
     @RequestMapping(value = AppConstants.URI_DEPOSIT, method = RequestMethod.POST)
-    public String depositPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType, Principal principal) {
+    public String depositPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType,
+                              Principal principal, Model model) {
   		L.debug("79 : Start : AccountController.depositPOST(...)");
-        accountService.deposit(accountType, Double.parseDouble(amount), principal);
+        String targetAccount = accountType.equalsIgnoreCase("Primary") ? "活期账户" : "储蓄账户";
+        model.addAttribute("targetAccount", targetAccount);
+        model.addAttribute("accountType", accountType);
+        model.addAttribute("amount", amount);
+        model.addAttribute("currency", "USD");
+        model.addAttribute("fundSource", "外部银行账户");
+        model.addAttribute("fee", "0.00");
+        model.addAttribute("expectedBalanceIncrease", amount);
         L.debug("82 : End : AccountController.depositPOST(...)");
+        return "depositConfirm";
+    }
 
+    @RequestMapping(value = AppConstants.URI_DEPOSIT_CONFIRM, method = RequestMethod.POST)
+    public String depositConfirmPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType,
+                                     Principal principal) {
+        L.debug("Start : AccountController.depositConfirmPOST(...)");
+        accountService.deposit(accountType, Double.parseDouble(amount), principal);
+        L.debug("End : AccountController.depositConfirmPOST(...)");
         return "redirect:/userFront";
     }
     

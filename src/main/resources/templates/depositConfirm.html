@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="common/header :: common-header"/>
+<body roleId="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+<head th:replace="common/header :: navbar"/>
+<div class="container main">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h2>存款确认</h2>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <dl class="dl-horizontal">
+                        <dt>目标账户</dt>
+                        <dd th:text="${targetAccount}">活期账户</dd>
+                        <dt>金额</dt>
+                        <dd th:text="${amount}">0.00</dd>
+                        <dt>币种</dt>
+                        <dd th:text="${currency}">USD</dd>
+                        <dt>资金来源</dt>
+                        <dd th:text="${fundSource}">外部银行账户</dd>
+                        <dt>手续费</dt>
+                        <dd><span th:text="${fee} + '手续费'">0.00手续费</span></dd>
+                        <dt>预计余额增加</dt>
+                        <dd th:text="${expectedBalanceIncrease}">0.00</dd>
+                    </dl>
+                </div>
+            </div>
+            <form th:action="@{/account/deposit/confirm}" method="post">
+                <input type="hidden" name="accountType" th:value="${accountType}"/>
+                <input type="hidden" name="amount" th:value="${amount}"/>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <a th:href="@{/account/deposit}" class="btn btn-lg btn-default btn-block">返回修改</a>
+                    </div>
+                    <div class="col-xs-6">
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">确认存款</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="common/header :: body-bottom-scripts"/>
+
+</body>
+</html>
